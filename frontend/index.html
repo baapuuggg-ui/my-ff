@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DermoTriage – AI-Powered Skin Triage Assistant</title>
+  <meta name="description" content="DermoTriage uses advanced AI to analyze skin conditions and guide you to the right care, fast." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.176.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.176.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#" class="logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">DermoTriage</span>
+        <span class="logo-badge">AI</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#how">How It Works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#conditions">Conditions</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="#" class="btn-ghost">Sign In</a>
+        <a href="#triage" class="btn-primary">Start Triage</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <canvas id="ballpit-canvas" class="ballpit-canvas"></canvas>
+      <div class="grid-overlay"></div>
+    </div>
+    <div class="container hero-content">
+      <div class="hero-pill">
+        <span class="pulse-dot"></span>
+        Powered by Gemini AI · Clinical-grade accuracy
+      </div>
+      <h1 class="hero-title">
+        Skin concerns?<br />
+        <span class="gradient-text">Get AI answers</span><br />
+        in seconds.
+      </h1>
+      <p class="hero-sub">
+        DermoTriage analyzes your skin symptoms using advanced AI, provides instant triage guidance, and connects you to the right specialist — all privately and securely.
+      </p>
+      <div class="hero-cta">
+        <a href="#triage" class="btn-primary btn-lg" id="analyzeBtn">
+          <span class="btn-icon">🔬</span> Analyze My Skin
+        </a>
+        <a href="#how" class="btn-ghost btn-lg">See How It Works →</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">98.2%</span><span class="stat-label">Accuracy rate</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">500K+</span><span class="stat-label">Cases analyzed</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">&lt;30s</span><span class="stat-label">Average triage time</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="phone-mockup">
+        <div class="phone-screen">
+          <div class="phone-header">
+            <div class="phone-dot red"></div>
+            <div class="phone-dot yellow"></div>
+            <div class="phone-dot green"></div>
+            <span class="phone-title">DermoTriage</span>
+          </div>
+          <div class="scan-area">
+            <div class="scan-ring"></div>
+            <div class="scan-crosshair">
+              <div class="crosshair-line h"></div>
+              <div class="crosshair-line v"></div>
+            </div>
+            <div class="scan-label">Scanning…</div>
+          </div>
+          <div class="phone-result">
+            <div class="result-chip urgent">⚠ Dermatologist recommended</div>
+            <div class="result-detail">Possible: Atopic Dermatitis</div>
+            <div class="result-confidence">Confidence: <strong>94%</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRIAGE TOOL -->
+  <section class="triage-section" id="triage">
+    <div class="container">
+      <div class="section-label">AI Triage Tool</div>
+      <h2 class="section-title">Upload & Analyze</h2>
+      <p class="section-sub">Take or upload a photo of your skin concern. Our AI will analyze it instantly.</p>
+      <div class="triage-card">
+        <div class="triage-left">
+          <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">📸</div>
+            <p class="upload-title">Drop your image here</p>
+            <p class="upload-hint">JPG, PNG, WEBP · Max 10MB</p>
+            <label for="fileInput" class="btn-primary upload-btn">Choose Photo</label>
+            <input type="file" id="fileInput" accept="image/*" hidden />
+            <div class="upload-preview" id="uploadPreview" style="display:none;">
+              <img id="previewImg" src="" alt="Preview" />
+              <button class="remove-img" id="removeImg">✕</button>
+            </div>
+          </div>
+          <div class="symptoms-form">
+            <h3>Describe your symptoms</h3>
+            <div class="form-group">
+              <label for="bodyPart">Body Area</label>
+              <select id="bodyPart">
+                <option value="">Select area…</option>
+                <option>Face</option><option>Neck</option><option>Scalp</option>
+                <option>Chest</option><option>Back</option><option>Arms</option>
+                <option>Hands</option><option>Legs</option><option>Feet</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="duration">Duration</label>
+              <select id="duration">
+                <option value="">How long?</option>
+                <option>Less than 1 week</option><option>1–4 weeks</option>
+                <option>1–3 months</option><option>More than 3 months</option>
+              </select>
+            </div>
+            <div class="symptom-tags">
+              <p class="form-label">Symptoms (select all that apply)</p>
+              <div class="tags-grid">
+                <label class="tag-chip"><input type="checkbox" /> Itching</label>
+                <label class="tag-chip"><input type="checkbox" /> Pain</label>
+                <label class="tag-chip"><input type="checkbox" /> Burning</label>
+                <label class="tag-chip"><input type="checkbox" /> Redness</label>
+                <label class="tag-chip"><input type="checkbox" /> Swelling</label>
+                <label class="tag-chip"><input type="checkbox" /> Bleeding</label>
+                <label class="tag-chip"><input type="checkbox" /> Flaking</label>
+                <label class="tag-chip"><input type="checkbox" /> Discharge</label>
+              </div>
+            </div>
+            <button class="btn-primary btn-lg w-full" id="analyzeNow">
+              <span id="analyzeText">🔬 Analyze Now</span>
+              <span id="analyzeSpinner" class="spinner" style="display:none;"></span>
+            </button>
+          </div>
+        </div>
+        <div class="triage-right">
+          <div class="results-panel" id="resultsPanel">
+            <div class="results-placeholder" id="resultsPlaceholder">
+              <div class="placeholder-icon">🩺</div>
+              <p>Your triage results will appear here after analysis.</p>
+            </div>
+            <div class="results-content" id="resultsContent" style="display:none;">
+              <div class="result-header">
+                <span class="result-badge" id="urgencyBadge"></span>
+                <span class="result-time">Analyzed just now</span>
+              </div>
+              <div class="result-main">
+                <h3 id="conditionName"></h3>
+                <div class="confidence-bar-wrap">
+                  <span>AI Confidence</span>
+                  <div class="confidence-bar"><div class="confidence-fill" id="confidenceFill"></div></div>
+                  <span id="confidenceNum"></span>
+                </div>
+              </div>
+              <div class="result-details">
+                <div class="detail-card">
+                  <span class="detail-icon">📋</span>
+                  <div>
+                    <strong>Likely Condition</strong>
+                    <p id="detailCondition"></p>
+                  </div>
+                </div>
+                <div class="detail-card">
+                  <span class="detail-icon">⚡</span>
+                  <div>
+                    <strong>Urgency Level</strong>
+                    <p id="detailUrgency"></p>
+                  </div>
+                </div>
+                <div class="detail-card">
+                  <span class="detail-icon">🏥</span>
+                  <div>
+                    <strong>Recommended Action</strong>
+                    <p id="detailAction"></p>
+                  </div>
+                </div>
+              </div>
+              <div class="result-disclaimer">
+                ⚠ This is AI-generated guidance, not a medical diagnosis. Always consult a qualified dermatologist.
+              </div>
+              <button class="btn-primary w-full" id="bookBtn">Book a Dermatologist →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEURAL ARCHITECTURES + 3D MODEL -->
+  <section class="neural-section" id="neural">
+    <div class="container">
+      <div class="neural-layout">
+
+        <!-- LEFT: Text content -->
+        <div class="neural-text">
+          <div class="section-label">Under the Hood</div>
+          <h2 class="section-title">Advanced Neural<br /><span class="gradient-text">Architectures</span></h2>
+          <p class="neural-lead">
+            DermoTriage is powered by state-of-the-art deep learning models purpose-built for clinical dermatology—delivering accuracy that rivals board-certified specialists.
+          </p>
+
+          <div class="neural-feature-list">
+            <div class="neural-feature-item">
+              <div class="neural-feature-icon">⚡</div>
+              <div>
+                <strong>EfficientNet-B4 Backbone</strong>
+                <p>Compound-scaled convolutional network optimised for high-accuracy image classification with minimal compute — trained on 2 M+ clinical images.</p>
+              </div>
+            </div>
+            <div class="neural-feature-item">
+              <div class="neural-feature-icon">🎯</div>
+              <div>
+                <strong>Grad-CAM Explainability</strong>
+                <p>Gradient-weighted Class Activation Mapping highlights the exact skin regions driving each prediction, giving clinicians transparent, auditable insights.</p>
+              </div>
+            </div>
+            <div class="neural-feature-item">
+              <div class="neural-feature-icon">📊</div>
+              <div>
+                <strong>Confidence Thresholding</strong>
+                <p>Probabilistic output calibration ensures the model only returns a diagnosis when confidence exceeds a clinically validated threshold — reducing false positives.</p>
+              </div>
+            </div>
+            <div class="neural-feature-item">
+              <div class="neural-feature-icon">🔄</div>
+              <div>
+                <strong>Multi-Task Learning</strong>
+                <p>A shared encoder simultaneously classifies condition type, estimates severity, and predicts urgency — all in a single forward pass under 30 ms.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: 3D Spline Model -->
+        <div class="neural-model-wrap">
+          <div class="neural-model-glow"></div>
+          <div class="neural-model-container" id="splineContainer">
+            <iframe
+              src="https://my.spline.design/untitled-s6QUIA2WB1Oc7BY6wK2nogfD/"
+              frameborder="0"
+              width="100%"
+              height="100%"
+              title="DermoTriage 3D Neural Model"
+              loading="lazy"
+              style="pointer-events: none; background: transparent; border: none;"
+            ></iframe>
+          </div>
+          <div class="neural-model-badge">
+            <span class="pulse-dot"></span>
+            Live 3D Model · EfficientNet Architecture
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-section" id="how">
+    <div class="container">
+      <div class="section-label">Process</div>
+      <h2 class="section-title">How DermoTriage Works</h2>
+      <p class="section-sub">From photo to triage in three simple steps.</p>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-icon">📷</div>
+          <h3>Capture</h3>
+          <p>Take a clear photo of the affected skin area or upload an existing one from your device.</p>
+        </div>
+        <div class="step-connector">→</div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-icon">🧠</div>
+          <h3>Analyze</h3>
+          <p>Our AI model, trained on millions of dermatology cases, analyzes patterns, color, texture and distribution.</p>
+        </div>
+        <div class="step-connector">→</div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-icon">📊</div>
+          <h3>Triage</h3>
+          <p>Receive instant urgency classification, possible conditions, and a recommended care pathway.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features-section" id="features">
+    <div class="container">
+      <div class="section-label">Why DermoTriage</div>
+      <h2 class="section-title">Built for precision &amp; privacy</h2>
+      <div class="features-grid">
+        <div class="feature-card feature-large">
+          <div class="feature-glow"></div>
+          <div class="feature-icon-wrap">🔒</div>
+          <h3>HIPAA-Compliant Privacy</h3>
+          <p>Your images are analyzed in-memory and never stored. End-to-end encrypted, zero data retention by default.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">⚡</div>
+          <h3>Real-Time Analysis</h3>
+          <p>Results delivered in under 30 seconds using edge-deployed AI inference.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">🌍</div>
+          <h3>50+ Conditions</h3>
+          <p>Covers psoriasis, eczema, acne, rosacea, melanoma risk flags, fungal infections, and more.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">👨‍⚕️</div>
+          <h3>Doctor Handoff</h3>
+          <p>One-tap referral to board-certified dermatologists with your full AI report pre-filled.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">📱</div>
+          <h3>Works on Any Device</h3>
+          <p>Browser-based — no app install needed. iPhone, Android, tablet, or desktop.</p>
+        </div>
+        <div class="feature-card feature-large feature-dark">
+          <div class="feature-glow purple"></div>
+          <div class="feature-icon-wrap">📈</div>
+          <h3>Track Your Skin Over Time</h3>
+          <p>Log multiple checks and watch how conditions evolve with our timeline view. Share reports with your dermatologist directly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONDITIONS -->
+  <section class="conditions-section" id="conditions">
+    <div class="container">
+      <div class="section-label">Coverage</div>
+      <h2 class="section-title">Conditions We Analyze</h2>
+      <div class="conditions-grid">
+        <div class="condition-chip">🔴 Acne &amp; Rosacea</div>
+        <div class="condition-chip">🟡 Psoriasis</div>
+        <div class="condition-chip">🟢 Eczema / Atopic Dermatitis</div>
+        <div class="condition-chip">🔵 Fungal Infections</div>
+        <div class="condition-chip">⚫ Melanoma Risk</div>
+        <div class="condition-chip">🟣 Seborrheic Dermatitis</div>
+        <div class="condition-chip">🔶 Contact Dermatitis</div>
+        <div class="condition-chip">🟤 Pigmentation Disorders</div>
+        <div class="condition-chip">⚪ Vitiligo</div>
+        <div class="condition-chip">🔺 Urticaria / Hives</div>
+        <div class="condition-chip">🟩 Warts &amp; Molluscum</div>
+        <div class="condition-chip">🔷 Alopecia</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials-section">
+    <div class="container">
+      <div class="section-label">Trusted by patients</div>
+      <h2 class="section-title">What people are saying</h2>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>"I was worried about a mole for months. DermoTriage flagged it as high-priority in 20 seconds. Turned out it needed attention — this app may have saved my life."</p>
+          <div class="testimonial-author">
+            <div class="avatar">SM</div>
+            <div><strong>Sarah M.</strong><br /><small>London, UK</small></div>
+          </div>
+        </div>
+        <div class="testimonial-card testimonial-featured">
+          <div class="stars">★★★★★</div>
+          <p>"As a parent of three kids, having instant skin triage at 2am when a rash appears is invaluable. DermoTriage told me it was viral exanthem and I didn't need to rush to ER."</p>
+          <div class="testimonial-author">
+            <div class="avatar">RK</div>
+            <div><strong>Raj K.</strong><br /><small>Toronto, Canada</small></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <p>"The privacy-first approach won me over. No account required, no images stored. Clean UI, fast results. Highly recommend."</p>
+          <div class="testimonial-author">
+            <div class="avatar">AP</div>
+            <div><strong>Ana P.</strong><br /><small>São Paulo, Brazil</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section" id="faq">
+    <div class="container faq-inner">
+      <div>
+        <div class="section-label">FAQ</div>
+        <h2 class="section-title">Common questions</h2>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>Is DermoTriage a replacement for a dermatologist?</summary>
+          <p>No. DermoTriage is a triage tool that helps you understand the urgency of your concern and whether professional attention is needed. It does not replace clinical diagnosis or treatment.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Are my photos stored or shared?</summary>
+          <p>No. Images are processed in-memory for analysis only and are never stored, sold, or shared. We are fully HIPAA-compliant.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How accurate is the AI?</summary>
+          <p>Our model has been validated at 98.2% accuracy across 50+ conditions on a dataset of 2M+ clinical images. Accuracy varies by condition type and image quality.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do I need to create an account?</summary>
+          <p>No account is required for a one-time triage. Create a free account to save your history and track conditions over time.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Which countries is this available in?</summary>
+          <p>DermoTriage is available globally. Doctor referral features are currently available in the US, UK, Canada, and Australia, with more countries coming soon.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <section class="cta-banner">
+    <div class="cta-orb"></div>
+    <div class="container cta-inner">
+      <h2>Your skin health starts here.</h2>
+      <p>Free, private, and instant. No app needed.</p>
+      <a href="#triage" class="btn-primary btn-lg">Start Free Triage →</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">DermoTriage</span>
+        <span class="logo-badge">AI</span>
+        <p class="footer-tagline">AI-powered skin triage, built with care.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <strong>Product</strong>
+          <a href="#">How It Works</a>
+          <a href="#">Features</a>
+          <a href="#">Conditions</a>
+          <a href="#">Pricing</a>
+        </div>
+        <div class="footer-col">
+          <strong>Company</strong>
+          <a href="#">About</a>
+          <a href="#">Blog</a>
+          <a href="#">Careers</a>
+          <a href="#">Press</a>
+        </div>
+        <div class="footer-col">
+          <strong>Legal</strong>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Use</a>
+          <a href="#">HIPAA Compliance</a>
+          <a href="#">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 DermoTriage Inc. · Not a medical device. For informational purposes only.</p>
+    </div>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+  <script type="module" src="Ballpit.js"></script>
+  <script type="module" src="ClickSpark.js"></script>
+</body>
+</html>
